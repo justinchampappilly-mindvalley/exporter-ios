@@ -14,7 +14,7 @@ extension UIColor {
     {{ createDocumentationComment(token.description, "    ") }}
     {[/]}
     static var {[ inject "token_name" context this /]}: UIColor {
-        {[ inject "uicolor" context token.value /]}
+        {[ inject "color" context token.value /]}
     }
     {[/]}
     {[/]}
