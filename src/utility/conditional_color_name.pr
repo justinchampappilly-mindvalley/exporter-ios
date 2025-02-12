@@ -1,0 +1,6 @@
+{[ let colorName = getNameForColor(context.color.hex) /]}
+{[if (colorName)]}
+.{{colorName.camelcased(false)}}
+{[ else ]}
+{[ inject "color" context context.color /]}
+{[/]}
