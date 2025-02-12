@@ -1,0 +1,5 @@
+{[ if (context.description && context.description.count() !== 0) ]}
+
+{{ createDocumentationComment(context.description, "    ") }}
+
+{[/]}

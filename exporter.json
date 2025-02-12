@@ -1,24 +1,21 @@
 {
   "id": "io.supernova.ios-swiftui",
   "name": "iOS SwiftUI",
-  "description": "iOS SwiftUI token and style exporter",
+  "description": "iOS UIColor token exporter for figma veriables",
   "source_dir": "src",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "usesBrands": true,
+  "usesThemes": true,
   "tags": [
     "iOS",
-    "SwiftUI",
+    "UIColor",
     "Tokens",
-    "Styles",
     "Colors",
-    "Borders",
-    "Gradients",
-    "Measures",
     "Typography",
-    "Radii"
+    "theme"
   ],
-  "author": "Vaclav Lustek",
-  "organization": "Supernova",
+  "author": "Justin Champappilly",
+  "organization": "Mindvalley",
   "homepage": "https://supernova.io",
   "config": {
     "output": "output.json",
@@ -26,7 +23,7 @@
     "js": "src/functions.js"
   },
   "engines": {
-    "pulsar": "1.0.0",
-    "supernova": "1.0.0"
+    "pulsar": "latest",
+    "supernova": "latest"
   }
 }
