@@ -1,6 +1,6 @@
 {
-  "id": "io.supernova.ios-swiftui",
-  "name": "iOS SwiftUI",
+  "id": "io.supernova.ios-uicolor-token-exporter",
+  "name": "iOS UIColor Token Exporter",
   "description": "iOS UIColor token exporter for figma veriables",
   "source_dir": "src",
   "version": "2.0.0",

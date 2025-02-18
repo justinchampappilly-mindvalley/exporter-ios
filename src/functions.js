@@ -11,6 +11,15 @@ const tokenMap = {};
     return text.trim().split("\n").map((line, index) => ((index > 0) ? `${indentationString}` : ``) + `/// ${line}`).join("\n")
 }
 
+/**
+ * Checks if a given token is a "Color Styles" token.
+ *
+ * A token is considered a "Color Styles" token if it has a property with the code name "collection"
+ * and the collection ID matches the ID of the "Color Styles" collection.
+ *
+ * @param {Object} token - The token to check.
+ * @returns {boolean} - Returns true if the token is a "Color Styles" token, otherwise false.
+ */
 function isColorStylesToken(token) {
     if (!token || !token.propertyValues || !token.properties) {
         return false;
@@ -46,6 +55,16 @@ function objectToPrettyJson(object) {
     }, 2);
 }
 
+/**
+ * Groups color tokens by their name from the provided theme data.
+ *
+ * This function iterates through the themes in the provided theme data and
+ * groups color tokens by their name if the theme name is "Dark" or "Light".
+ * The grouped tokens are stored in a global `tokenMap` object.
+ *
+ * @param {Object} themeData - The theme data containing themes and their tokens.
+ * @returns {string} An empty string.
+ */
 function groupTokensByName(themeData) {
   for (const themeKey in themeData) {
     const theme = themeData[themeKey];
@@ -66,6 +85,13 @@ function groupTokensByName(themeData) {
   return "";
 }
 
+/**
+ * Retrieves the color object for a given color name and theme ID.
+ *
+ * @param {string} colorName - The name of the color to retrieve.
+ * @param {string} themeId - The ID of the theme to match.
+ * @returns {Object} The color object that matches the provided theme ID, or the first entry if no match is found.
+ */
 function getColorsFor(colorName, themeId) {
     let colormap = tokenMap[colorName]
     
@@ -167,6 +193,10 @@ function getTokenGroupIds(tokenGroup) {
   return tokenIds.concat(childrenIds);
 }
 
+function isColorAllowed(color) {
+  return color.name != "Black" && color.name != "White";
+}
+
 Pulsar.registerFunction("createDocumentationComment", createDocumentationComment)
 Pulsar.registerFunction("isColorStylesToken", isColorStylesToken)
 Pulsar.registerFunction("groupTokensByName", groupTokensByName)
@@ -174,6 +204,7 @@ Pulsar.registerFunction("getColorsFor", getColorsFor)
 Pulsar.registerFunction("isColorThemed", isColorThemed)
 Pulsar.registerFunction("getNameForColor", getNameForColor)
 Pulsar.registerFunction("getColorMap", getColorMap)
+Pulsar.registerFunction("isColorAllowed", isColorAllowed)
 /*Pulsar.registerFunction("objectToPrettyJson", (object) => {
     const seen = new WeakSet();
     return JSON.stringify(object, (key, value) => {
