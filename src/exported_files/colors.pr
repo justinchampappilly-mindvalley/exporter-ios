@@ -16,9 +16,10 @@ public extension UIColor {
 {[ for colorToken in colorTokenInGroups ]}
 {[ if isColorAllowed(colorToken) ]}
 {[if isColorStylesToken(colorToken) ]}
-{[if isColorThemed(colorToken.name) ]}
-{[ let lightColor = getColorsFor(colorToken.name, "Light") /]}
-{[ let darkColor = getColorsFor(colorToken.name, "Dark") /]}
+{[ const colorName = makeColorName(colorToken) /]}
+{[ let lightColor = getColorsFor(colorName, "Light") /]}
+{[ let darkColor = getColorsFor(colorName, "Dark") /]}
+{[if isColorThemed(colorName) ]}
 {[ inject "documentation" context colorToken /]}
 
     static let {[ inject "token_name" context colorToken /]} = UIColor { (traitCollection: UITraitCollection) -> UIColor in
@@ -26,13 +27,18 @@ public extension UIColor {
 
     }
 {[ else ]}
-{[ let lightColor = getColorsFor(colorToken.name, "LightUI") /]}
 {[ inject "documentation" context colorToken /]}
-
+{[ if lightColor ]}
     static var {[ inject "token_name" context colorToken /]} : UIColor { 
         {[ inject "color" context lightColor.color /]}
 
     }
+  {[ else ]}  
+    static var {[ inject "token_name" context colorToken /]} : UIColor { 
+        {[ inject "color" context darkColor.color /]}
+
+    }
+{[/]}    
 {[/]}   
 {[/]}
 {[/]}    
