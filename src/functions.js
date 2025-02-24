@@ -1,4 +1,35 @@
 const tokenMap = {};
+
+const ColorStylesEnum = {
+  COLOR_STYLES: "Color Styles",
+  EVE_COLOR_STYLES: "Eve Color Styles"
+};
+
+
+class ColorObject {
+  constructor(themeId, color, style, name) {
+    this.themeId = themeId;
+    this.color = color;
+    this.style = style;
+    this.name = name;
+  }
+
+  static fromToken(color, theme) {
+    const colorStyle = getColorStyle(color);
+    if (colorStyle !== null) {
+      const name = makeColorName(color);
+      let colorName = name;
+      if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES && name.includes('GradientBase')) {
+        colorName = name.replace('GradientBase', 'EveGB');
+      } else if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES) {
+        colorName = "Eve" + color.name;
+      }
+      return new ColorObject(theme.name, color.value, colorStyle, colorName);
+    }
+    return null;
+  }
+}
+
 /**
  * 
  * @param {string} text 
@@ -12,34 +43,37 @@ const tokenMap = {};
 }
 
 /**
- * Checks if a given token is a "Color Styles" token.
+ * Retrieves the color style name from a token object.
  *
- * A token is considered a "Color Styles" token if it has a property with the code name "collection"
- * and the collection ID matches the ID of the "Color Styles" collection.
- *
- * @param {Object} token - The token to check.
- * @returns {boolean} - Returns true if the token is a "Color Styles" token, otherwise false.
+ * @param {Object} token - The token object containing property values and properties.
+ * @returns {string|null} The name of the matched color style option, or null if no match is found.
  */
+function getColorStyle(token) {
+  if (!token || !token.propertyValues || !token.properties) {
+    return null;
+  }
+  
+  const collectionId = token.propertyValues.collection;
+  if (!collectionId) {
+    return null;
+  }
+  
+  // Find the "Collection" property in the properties array
+  const collectionProperty = token.properties.find(prop => prop.codeName === "collection");
+  if (!collectionProperty || !collectionProperty.options) {
+    return null;
+  }
+  
+  // Check if the collection ID matches "Color Styles" or "Eve Color Styles"
+  const matchedOption = collectionProperty.options.find(option => 
+    option.id === collectionId && (option.name === ColorStylesEnum.COLOR_STYLES || option.name === ColorStylesEnum.EVE_COLOR_STYLES)
+  );
+
+  return matchedOption ? matchedOption.name : null;
+}
+
 function isColorStylesToken(token) {
-    if (!token || !token.propertyValues || !token.properties) {
-        return false;
-    }
-    
-    const collectionId = token.propertyValues.collection;
-    if (!collectionId) {
-        return false;
-    }
-    
-    // Find the "Collection" property in the properties array
-    const collectionProperty = token.properties.find(prop => prop.codeName === "collection");
-    if (!collectionProperty || !collectionProperty.options) {
-        return false;
-    }
-    
-    // Check if the collection ID matches "Color Styles"
-    return collectionProperty.options.some(option => 
-        option.id === collectionId && option.name === "Color Styles"
-    );
+  return getColorStyle(token) !== null;
 }
 
 function objectToPrettyJson(object) {
@@ -72,12 +106,20 @@ function groupTokensByName(themeData) {
       const overriddenTokens = theme.overriddenTokens;
       for (const colorToken in overriddenTokens) {
         const color = overriddenTokens[colorToken];
-        if (isColorStylesToken(color)) {
-          const name = color.name;
+        const colorStyle = getColorStyle(color);
+        if (colorStyle !== null) {
+          const name = makeColorName(color);
           if (!tokenMap[name]) {
-          tokenMap[name] = [];
+            tokenMap[name] = [];
           }
-          tokenMap[name].push({themeId: theme.name, color: color.value});
+          if (colorStyle === ColorStylesEnum.COLOR_STYLES) {
+            tokenMap[name].push({themeId: theme.name, color: color.value, style: colorStyle, name: color.name});
+          } else if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES && name.includes('GradientBase')) {
+            const newName = name.replace('GradientBase', 'EveGB');
+            tokenMap[name].push({themeId: theme.name, color: color.value, style: colorStyle, name: newName});
+          } else {
+            tokenMap[name].push({themeId: theme.name, color: color.value, style: colorStyle, name: "Eve" + color.name});
+          }
         }
       }
     }
@@ -93,16 +135,22 @@ function groupTokensByName(themeData) {
  * @returns {Object} The color object that matches the provided theme ID, or the first entry if no match is found.
  */
 function getColorsFor(colorName, themeId) {
-    let colormap = tokenMap[colorName]
+    let colormap = tokenMap[colorName];
+    
+    // Check if colormap is defined and is an array
+    if (!Array.isArray(colormap) || colormap.length === 0) {
+        console.log(`No colormap found for colorName: ${colorName}`);
+        return null;
+    }
     
     // Use Array.find to get the first entry that matches the provided themeId
     let tokenEntry = colormap[0];
     for (const itemIndex in colormap) {
-      const colorObject = colormap[itemIndex];
-      let colorTheme = colorObject.themeId;
-       if (colorTheme === themeId) {
-          return colorObject;
-       }
+        const colorObject = colormap[itemIndex];
+        let colorTheme = colorObject.themeId;
+        if (colorTheme === themeId) {
+            return colorObject;
+        }
     }
     return tokenEntry;
 }
@@ -116,6 +164,9 @@ function getColorsFor(colorName, themeId) {
  */
 function isColorThemed(colorName) {
   let entry = tokenMap[colorName];
+  if (!Array.isArray(entry)) {
+    return false;
+  }
   let darkColor = null;
   let lightColor = null;
 
@@ -154,6 +205,7 @@ function getUnThemedColors() {
 
 
 function findColorKey(singleThemedColors, hexCode) {
+  console.log("Called findColorKey");
   for (const key in singleThemedColors) {
     for (const colorObj of singleThemedColors[key]) {
       if (colorObj && colorObj.color && colorObj.color.hex === hexCode) {
@@ -163,14 +215,47 @@ function findColorKey(singleThemedColors, hexCode) {
   }
 }
 
-function getNameForColor(colorValue) {
+function getNameForUnthemedColor(hexCode) {
   const singleThemedColors = getUnThemedColors();
-  const colorName = findColorKey(singleThemedColors, colorValue);
+  const colorName = findColorKey(singleThemedColors, hexCode);
   return colorName;
 }
 
 function getColorMap() {
   return tokenMap;
+}
+
+/**
+ * Retrieves the color name from a color object.
+ *
+ * @param {Object} colorObject - The color object to retrieve the name from.
+ * @returns {string|null} The color name, or null if an error occurs.
+ */
+function makeColorName(colorObject) {
+  try {
+    const parent = colorObject.parent;
+    const parentName = parent.name;
+    const colorName = colorObject.name;
+    
+    function getOriginName(colorObject) {
+      const origin = colorObject.origin;
+      if (origin && origin.name) {
+        return origin.name.replace(/\//g, "");
+      }
+      return "";
+    }
+
+    const originConCatinatedName = getOriginName(colorObject);
+
+    if (originConCatinatedName) {
+      return originConCatinatedName;
+    } else {
+      return colorName;
+    }
+  } catch (e) {
+    console.log("Error processing color object:", e.message);
+    return null;
+  }
 }
 
 /**
@@ -197,14 +282,27 @@ function isColorAllowed(color) {
   return color.name != "Black" && color.name != "White";
 }
 
+function getNameForColorToken(color) {
+  const key = makeColorName(color);
+  console.log("key " + key);
+  const tokenObject = tokenMap[key];
+  if (!tokenObject) {
+    return "null";
+  }
+  console.log("token object " + tokenObject.name);
+  return "tokenObject";
+}
+
 Pulsar.registerFunction("createDocumentationComment", createDocumentationComment)
 Pulsar.registerFunction("isColorStylesToken", isColorStylesToken)
 Pulsar.registerFunction("groupTokensByName", groupTokensByName)
 Pulsar.registerFunction("getColorsFor", getColorsFor)
 Pulsar.registerFunction("isColorThemed", isColorThemed)
-Pulsar.registerFunction("getNameForColor", getNameForColor)
+Pulsar.registerFunction("getNameForUnthemedColor", getNameForUnthemedColor)
 Pulsar.registerFunction("getColorMap", getColorMap)
 Pulsar.registerFunction("isColorAllowed", isColorAllowed)
+Pulsar.registerFunction("makeColorName", makeColorName)
+Pulsar.registerFunction("getNameForColorToken", getNameForColorToken)
 /*Pulsar.registerFunction("objectToPrettyJson", (object) => {
     const seen = new WeakSet();
     return JSON.stringify(object, (key, value) => {

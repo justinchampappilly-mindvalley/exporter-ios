@@ -1,4 +1,4 @@
-{[ let colorName = getNameForColor(context.color.hex) /]}
+{[ let colorName = getNameForUnthemedColor(context.color.hex) /]}
 {[if (colorName)]}
 .{{colorName.camelcased(false)}}
 {[ else ]}
