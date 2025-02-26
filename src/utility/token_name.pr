@@ -1,2 +1,2 @@
-{[ const name = getNameForColorToken(context) /]}
+{[ const name = context.name /]}
 {{ name.camelcased(false)}}
