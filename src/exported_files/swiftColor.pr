@@ -17,12 +17,12 @@ public extension Color {
     {[ let darkColor = getColorsFor(colorName, "Dark") /]}
     {[ if lightColor ]}
     static var {[ inject "token_name" context lightColor /]} : Color { 
-        Color(UIColor.{[ inject "token_name" context lightColor /]})
+        Color(uiColor: UIColor.{[ inject "token_name" context lightColor /]})
     }
 
     {[ else ]}  
     static var {[ inject "token_name" context darkColor /]} : Color { 
-        Color(UIColor.{[ inject "token_name" context darkColor /]})
+        Color(uiColor: UIColor.{[ inject "token_name" context darkColor /]})
     }
 
     {[/]}

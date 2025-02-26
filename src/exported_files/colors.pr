@@ -61,6 +61,8 @@ public extension UIColor {
                 return "{[ inject "token_name" context darkColor /]}"
         {[/]}
 {[/]}
+            default:
+                return "Unknown"
         }
     }
 }
@@ -68,7 +70,7 @@ public extension UIColor {
 // This extension is used for SwiftUI previews used to visially test the colors
 
 public extension UIColor {
-    static var allColors: [Color] {
+    static var allColors: [UIColor] {
         return [
 {[ for colorName in colorNames ]}
     {[ let lightColor = getColorsFor(colorName, "Light") /]}
