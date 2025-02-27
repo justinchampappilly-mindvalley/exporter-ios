@@ -15,15 +15,15 @@ class ColorObject {
     this.name = name;
   }
 
-  static fromToken(color, theme) {
+  static fromToken(color, theme, brand) {
     const colorStyle = makeColorStyle(color);
     if (colorStyle !== null) {
       const name = makeColorName(color);
       let colorName = name;
       if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES && name.includes('GradientBase')) {
-        colorName = name.replace('GradientBase', 'EveGB');
+        colorName = name.replace('GradientBase', brand + 'GB');
       } else if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES) {
-        colorName = "Eve" + color.name;
+        colorName = brand + color.name;
       } else if (colorStyle === ColorStylesEnum.COLOR_STYLES) {
         colorName = color.name;
       }
@@ -84,16 +84,17 @@ function objectToPrettyJson(object) {
  * The grouped tokens are stored in a global `tokenMap` object.
  *
  * @param {Object} themeData - The theme data containing themes and their tokens.
+ * @param {string} brand - The brand name to append to color names.
  * @returns {string} An empty string.
  */
-function groupTokensByName(themeData) {
+function groupTokensByName(themeData, brand) {
   for (const themeKey in themeData) {
     const theme = themeData[themeKey];
     if (theme.name.trim() === "Dark" || theme.name.trim() === "Light") {
       const overriddenTokens = theme.overriddenTokens;
       for (const colorToken in overriddenTokens) {
         const color = overriddenTokens[colorToken];
-        const colorObject = ColorObject.fromToken(color, theme);
+        const colorObject = ColorObject.fromToken(color, theme, brand);
         if (colorObject) {
           if (!tokenMap[colorObject.name]) {
             tokenMap[colorObject.name] = [];
