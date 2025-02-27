@@ -9,13 +9,16 @@ public extension UIColor {
         return traitCollection.userInterfaceStyle == .dark
     }
 {* Polulate the color map with all variants of colors *}
-{[ const brand = ds.currentBrand() /]}
+   
+
+{[ const brands = ds.allBrands() /]}
+{[ for brand in brands ]}
 {[ const themesData = ds.allThemes(brand.id) /]}
 {[ const colorTokensTree = ds.tokenGroupTreeByType("Color", brand.id) /]}
 {{ groupTokensByName(themesData); }}
-{* Generete light and dark colors as static computed variables *}
 {[ const groupedTokenData = getColorMap() /]}
 {[ const colorNames = groupedTokenData.keys() /]}
+{* Generete light and dark colors as static computed variables *}
 {[ for colorName in colorNames ]}
     {[ if isColorAllowed(colorName) ]}
         {[ if isColorStylesToken(colorName) ]}
@@ -43,8 +46,11 @@ public extension UIColor {
         {[/]}
     {[/]}
 {[/]}
+{[/]}
 }
 
+{[ const groupedTokenData = getColorMap() /]}
+{[ const colorNames = groupedTokenData.keys() /]}
 // This extension is used for SwiftUI previews used to visially test the colors
 
 public extension UIColor {
