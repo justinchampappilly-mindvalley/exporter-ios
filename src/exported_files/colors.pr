@@ -15,6 +15,7 @@ public extension UIColor {
 {[ const themesData = ds.allThemes(brand.id) /]}
 {[ const colorTokensTree = ds.tokenGroupTreeByType("Color", brand.id) /]}
 {{ groupTokensByName(themesData, brand.name); }}
+{[/]}
 {[ const groupedTokenData = getColorMap() /]}
 {[ const colorNames = groupedTokenData.keys() /]}
 {* Generete light and dark colors as static computed variables *}
@@ -45,11 +46,8 @@ public extension UIColor {
         {[/]}
     {[/]}
 {[/]}
-{[/]}
 }
 
-{[ const groupedTokenData = getColorMap() /]}
-{[ const colorNames = groupedTokenData.keys() /]}
 // This extension is used for SwiftUI previews used to visially test the colors
 
 public extension UIColor {
