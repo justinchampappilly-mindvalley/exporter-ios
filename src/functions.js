@@ -32,6 +32,8 @@ class ColorObject {
       "magenta",
       "darkGray",
       "lightGray",
+      "indigo",
+      "teal",
       "clear"
     ].includes(colorName.toLowerCase());
   }
