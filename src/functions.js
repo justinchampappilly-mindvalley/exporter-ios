@@ -6,13 +6,34 @@ const ColorStylesEnum = {
   EVE_COLOR_STYLES: "Eve Color Styles"
 };
 
-
 class ColorObject {
   constructor(themeId, color, style, name) {
     this.themeId = themeId;
     this.color = color;
     this.style = style;
     this.name = name;
+  }
+
+
+  static isiOSSystemColor(colorName) {
+    return [
+      "blue",
+      "brown",
+      "gray",
+      "green",
+      "orange",
+      "pink",
+      "purple",
+      "red",
+      "yellow",
+      "white",
+      "black",
+      "cyan",
+      "magenta",
+      "darkGray",
+      "lightGray",
+      "clear"
+    ].includes(colorName.toLowerCase());
   }
 
   static fromToken(color, theme, brand) {
@@ -24,8 +45,10 @@ class ColorObject {
         colorName = name.replace('GradientBase', brand + 'GB');
       } else if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES) {
         colorName = brand + color.name;
-      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES) {
+      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES && !ColorObject.isiOSSystemColor(color.name)) {
         colorName = color.name;
+      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES && ColorObject.isiOSSystemColor(color.name)) {
+        colorName = "mv" + color.name;
       }
       return new ColorObject(theme.name, color.value, colorStyle, colorName);
     }

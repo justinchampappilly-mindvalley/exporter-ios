@@ -20,29 +20,27 @@ public extension UIColor {
 {[ const colorNames = groupedTokenData.keys() /]}
 {* Generete light and dark colors as static computed variables *}
 {[ for colorName in colorNames ]}
-    {[ if isColorAllowed(colorName) ]}
-        {[ if isColorStylesToken(colorName) ]}
-            {[ let lightColor = getColorsFor(colorName, "Light") /]}
-            {[ let darkColor = getColorsFor(colorName, "Dark") /]}
-            {[ if isColorThemed(colorName) ]}
+    {[ if isColorStylesToken(colorName) ]}
+        {[ let lightColor = getColorsFor(colorName, "Light") /]}
+        {[ let darkColor = getColorsFor(colorName, "Dark") /]}
+        {[ if isColorThemed(colorName) ]}
     static let {[ inject "token_name" context lightColor /]} = UIColor { (traitCollection: UITraitCollection) -> UIColor in
         return isDark(traitCollection) ? {[ inject "conditional_color_name" context darkColor /]} : {[ inject "conditional_color_name" context lightColor /]}
 
     }
     
-            {[ else ]}
-                {[ if lightColor ]}
+        {[ else ]}
+            {[ if lightColor ]}
     static var {[ inject "token_name" context lightColor /]} : UIColor { 
         {[ inject "color" context lightColor.color /]}
 
     }
-                {[ else ]}  
+            {[ else ]}  
     static var {[ inject "token_name" context darkColor /]} : UIColor { 
         {[ inject "color" context darkColor.color /]}
 
-    }
-                {[/]}    
-            {[/]}
+}
+            {[/]}    
         {[/]}
     {[/]}
 {[/]}
