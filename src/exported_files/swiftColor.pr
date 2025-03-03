@@ -22,7 +22,7 @@ public extension Color {
         Color(uiColor: UIColor.{[ inject "token_name" context lightColor /]})
     }
 
-    {[ else ]}  
+    {[ else ]}
     static var {[ inject "token_name" context darkColor /]} : Color { 
         Color(uiColor: UIColor.{[ inject "token_name" context darkColor /]})
     }
