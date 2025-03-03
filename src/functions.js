@@ -43,15 +43,14 @@ class ColorObject {
     if (colorStyle !== null) {
       const name = makeColorName(color);
       let colorName = name;
-      if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES && name.includes('GradientBase')) {
-        colorName = name.replace('GradientBase', brand + 'GB');
+      if (name.includes('GradientBase')) {
+        colorName = name.replace('GradientBase', colorStyle === ColorStylesEnum.EVE_COLOR_STYLES ? brand + 'GB' : "MV" + 'Gb');
       } else if (colorStyle === ColorStylesEnum.EVE_COLOR_STYLES) {
         colorName = brand + color.name;
-      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES && !ColorObject.isiOSSystemColor(color.name)) {
-        colorName = color.name;
-      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES && ColorObject.isiOSSystemColor(color.name)) {
-        colorName = "mv" + color.name;
+      } else if (colorStyle === ColorStylesEnum.COLOR_STYLES) {
+        colorName = ColorObject.isiOSSystemColor(color.name) ? "mv" + color.name : color.name;
       }
+      console.log("ColorObject: " + colorName);
       return new ColorObject(theme.name, color.value, colorStyle, colorName);
     }
     return null;
